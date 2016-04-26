@@ -1,0 +1,101 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>REST Example</title>
+    <meta charset="utf-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<body onload="bootstrap()">
+<script>
+
+
+    window.onbeforeunload = function(){
+        var data = {"endpoint_name":0,"version":"1.0","lifetime":"6000","binding_mode":"2","sms_no":"4082399318","room":"master","status":"white","id":0};
+        $.ajax({
+            url : "http://ec2-54-187-14-30.us-west-2.compute.amazonaws.com:8080/SmartHome_IOT/rest/deregister",
+            type: "POST",
+            data : JSON.stringify(data),
+            dataType: "json",
+            contentType: "application/json",
+            success: function(data, textStatus, jqXHR)
+            {
+                console.log(data);
+                light();
+            },
+            error: function (jqXHR, textStatus, errorThrown)
+            {
+
+            }
+        });
+
+    }
+
+    function bootstrap() {
+
+        var data = {"endpoint_name":0};
+
+        $.ajax({
+            url : "http://ec2-54-187-14-30.us-west-2.compute.amazonaws.com:8080/SmartHome_IOT/rest/",
+            type: "POST",
+            data : JSON.stringify(data),
+            dataType: "json",
+            contentType: "application/json",
+            success: function(data, textStatus, jqXHR)
+            {
+                data.endpoint_name = 0;
+                data.bootstrap_server_uri = "http://ec2-54-68-204-234.us-west-2.compute.amazonaws.com:8080/SmartHome_IOT/rest/";
+                var socket = io();
+                socket.on('connect', function(){
+                    socket.emit('adduser', data)
+                });
+                console.log(data);
+                register(data['reg_server_add']);
+            },
+            error: function (jqXHR, textStatus, errorThrown)
+            {
+
+            }
+        });
+    }
+
+    function register(url1){
+
+        var data = {"endpoint_name":"IOT","version":"1.0","lifetime":"6000","binding_mode":"2","sms_no":"4082399318","room":"master","status":"black","id":0};
+        $.ajax({
+            url : "http://ec2-54-187-14-30.us-west-2.compute.amazonaws.com:8080/SmartHome_IOT/rest/register",
+            type: "POST",
+            data : JSON.stringify(data),
+            dataType: "json",
+            contentType: "application/json",
+            success: function(data, textStatus, jqXHR)
+            {
+                console.log(data);
+                light();
+            },
+            error: function (jqXHR, textStatus, errorThrown)
+            {
+
+            }
+        });
+
+    }
+
+    function light(){
+
+        $.get( "http://ec2-54-187-14-30.us-west-2.compute.amazonaws.com:8080/SmartHome_IOT/rest/list", function( data ) {
+            document.body.style.backgroundColor = data;
+            setTimeout(light,100);
+        });
+
+    }
+
+
+</script>
+</body>
+</html>
